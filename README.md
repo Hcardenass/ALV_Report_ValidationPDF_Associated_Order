@@ -14,6 +14,19 @@ The implementation of this ALV report aims to facilitate the identification of o
 
 ![Program](Program.png)
 
+### INCLUDE ZSD_VAL_PDF_PEDIDOS_ALV_TOP
+
+### INCLUDE ZSD_VAL_PDF_PEDIDOS_ALV_SEL.
+
+### INCLUDE ZSD_VAL_PDF_PEDIDOS_ALV_CLS.
+
+### INCLUDE ZSD_VAL_PDF_PEDIDOS_ALV_MAI.
+
+### INCLUDE ZSD_VAL_PDF_PEDIDOS_ALV_PBO.
+
+### INCLUDE ZSD_VAL_PDF_PEDIDOS_ALV_PAI.
+
+### INCLUDE ZSD_VAL_PDF_PEDIDOS_ALV_F01.
 
 # ALV RESULT:
 
