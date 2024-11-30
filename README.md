@@ -12,7 +12,7 @@ The implementation of this ALV report aims to facilitate the identification of o
 
 ## PROGRAM:
 
-![Program](img/Program.png)
+![Program](IMG/Program.png)
 
 ### INCLUDE ZSD_VAL_PDF_PEDIDOS_ALV_TOP
 
