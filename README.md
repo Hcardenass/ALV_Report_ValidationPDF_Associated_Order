@@ -30,4 +30,4 @@ The implementation of this ALV report aims to facilitate the identification of o
 
 # ALV RESULT:
 
-![ALV_Report](IMG/ALV-Report.png)
+![ALV_Report](IMG/ALV.png)
