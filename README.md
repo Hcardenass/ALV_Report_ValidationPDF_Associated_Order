@@ -8,7 +8,7 @@ This lack of visibility can cause delays in making critical decisions and affect
 
 The implementation of this ALV report aims to facilitate the identification of orders that do not have an attached PDF, highlighting them visually (red if missing, green if present). This not only helps to ensure compliance with audit requirements, but also improves the efficiency of the commercial area and the reliability of internal processes, ensuring a better experience for customers.
 
-![Flow Chart](Flow%20Chart.png)
+![Flow Chart](IMG/Flow%20Chart.png)
 
 ## PROGRAM:
 
@@ -30,4 +30,4 @@ The implementation of this ALV report aims to facilitate the identification of o
 
 # ALV RESULT:
 
-![ALV_Report](ALV-Report.png)
+![ALV_Report](IMG/ALV-Report.png)
