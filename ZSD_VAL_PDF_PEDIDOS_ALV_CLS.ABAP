@@ -13,6 +13,13 @@ CLASS cl_alv_doc_asoc_ped DEFINITION.
         EXPORTING
           VALUE(e_exclude) TYPE ui_functions,
       refrescar_alv,
+      handle_toolbar_alv
+        FOR EVENT toolbar OF cl_gui_alv_grid
+        IMPORTING e_object e_interactive,
+      handle_user_command
+        FOR EVENT user_command OF cl_gui_alv_grid
+        IMPORTING e_ucomm,
+
       top_of_page FOR EVENT top_of_page OF cl_gui_alv_grid
         IMPORTING e_dyndoc_id.
 
@@ -97,6 +104,11 @@ CLASS cl_alv_doc_asoc_ped IMPLEMENTATION.
           EXPORTING
             i_event_id = cl_gui_alv_grid=>mc_evt_modified.
 
+        SET HANDLER me->handle_toolbar_alv
+                      FOR lo_grid_doc_asoc_ped.
+
+        SET HANDLER me->handle_user_command
+              FOR lo_grid_doc_asoc_ped.
 
         REFRESH lt_cat_alv.
         CALL METHOD me->genera_cat_alv_doc_asoc_ped
@@ -132,6 +144,8 @@ CLASS cl_alv_doc_asoc_ped IMPLEMENTATION.
           CHANGING
             it_outtab            = gt_dms_asoci_ped
             it_fieldcatalog      = lt_cat_alv.
+
+
       ENDIF.
     ELSE.
       CLEAR lwa_stbl.
@@ -275,6 +289,12 @@ CLASS cl_alv_doc_asoc_ped IMPLEMENTATION.
 
   METHOD top_of_page.
     FIELD-SYMBOLS: <fs_header> TYPE lvc_s_head.
+    DATA: lv_line_count  TYPE i,
+          lv_header_text TYPE string,
+          lv_empty_count TYPE i. " Contador de filas con filename vacío
+
+    DATA: dl_text(255) TYPE c.
+
 * Inicializando texto HTML
     IF NOT me->lcl_top IS INITIAL.
       CALL METHOD me->lcl_top->initialize_document.
@@ -293,16 +313,27 @@ CLASS cl_alv_doc_asoc_ped IMPLEMENTATION.
           parent = me->lcl_parent_html.
     ENDIF.
 
+    " Calcula la cantidad de registros en la tabla interna
+    DESCRIBE TABLE gt_dms_asoci_ped LINES lv_line_count.
+
+
+    " Contar filas donde el campo filename está vacío
+    LOOP AT gt_dms_asoci_ped INTO DATA(ls_dms_asoci_ped).
+      IF ls_dms_asoci_ped-filename IS INITIAL.
+        ADD 1 TO lv_empty_count.
+      ENDIF.
+    ENDLOOP.
 
 * Construyendo datos de Cabecera
 
     CALL METHOD me->lcl_top->add_text
       EXPORTING
-        text          = 'Reporte para Validación de PDFs Asociado al Pedido'
+        text          = 'Reporte para Validación de PDF Asociado al Pedido'
         sap_style     = cl_dd_area=>heading
         sap_fontstyle = cl_dd_area=>large
         sap_color     = cl_dd_area=>list_heading_int
         sap_emphasis  = cl_dd_area=>strong.
+
 
     CALL FUNCTION 'REUSE_ALV_GRID_COMMENTARY_SET'
       EXPORTING
@@ -316,7 +347,7 @@ CLASS cl_alv_doc_asoc_ped IMPLEMENTATION.
       EXPORTING
         mode = cl_gui_splitter_container=>mode_absolute.
 
-    me->li_length = me->li_length + 75.
+    me->li_length = me->li_length + 98.
     CALL METHOD me->lcl_splitter->set_row_height
       EXPORTING
         id     = 1
@@ -330,11 +361,51 @@ CLASS cl_alv_doc_asoc_ped IMPLEMENTATION.
         CALL METHOD me->lcl_top->add_picture
           EXPORTING
             picture_id = 'LOGO_TECNOFIL'
-            width      = '150'.
+            width      = '180'.
       CATCH cx_root INTO DATA(lo_exception).
         MESSAGE lo_exception->get_text( ) TYPE 'S' DISPLAY LIKE 'E'.
     ENDTRY.
 
+
+    CALL METHOD me->lcl_top->new_line.
+    CALL METHOD me->lcl_top->add_gap.
+    CALL METHOD me->lcl_top->add_text
+      EXPORTING
+        text         = 'Cantidad de Registros :'
+        sap_emphasis = cl_dd_area=>heading
+        sap_color    = cl_dd_area=>list_heading_int.
+
+
+
+    dl_text = lv_line_count.
+    CALL METHOD me->lcl_top->add_text
+      EXPORTING
+        text         = dl_text
+        sap_emphasis = cl_dd_area=>heading
+        sap_color    = cl_dd_area=>list_heading_int.
+
+    CLEAR: dl_text,lv_line_count.
+
+    CALL METHOD me->lcl_top->add_gap
+      EXPORTING
+        width = 10.
+
+    CALL METHOD me->lcl_top->add_text
+      EXPORTING
+        text         = 'Pedidos sin PDF asignado:'
+        sap_emphasis = cl_dd_area=>heading
+        sap_color    = cl_dd_area=>list_heading_int.
+
+
+    dl_text = lv_empty_count.
+    CALL METHOD me->lcl_top->add_text
+      EXPORTING
+        text         = dl_text
+        sap_emphasis = cl_dd_area=>heading
+        sap_color    = cl_dd_area=>list_heading_int.
+
+
+    CLEAR: dl_text,lv_empty_count.
     CALL METHOD me->lcl_top->merge_document.
 
     me->lcl_top->html_control = me->lcl_html_cntrl.
@@ -349,6 +420,29 @@ CLASS cl_alv_doc_asoc_ped IMPLEMENTATION.
         html_display_error = 1.
 
   ENDMETHOD.
+
+  METHOD handle_toolbar_alv.
+
+    DATA: lwa_toolbar TYPE stb_button.
+
+    " Crear botón para Refresh
+    CLEAR lwa_toolbar.
+    MOVE 'REFRESH'         TO lwa_toolbar-function.   " Identificador del botón
+    MOVE icon_refresh      TO lwa_toolbar-icon.       " Icono de refresh estándar
+    MOVE 'Refresh'         TO lwa_toolbar-quickinfo.  " Tooltip del botón
+    MOVE 'Actualizar'      TO lwa_toolbar-text.       " Texto visible en el botón
+    MOVE ' '               TO lwa_toolbar-disabled.   " Habilitado por defecto
+    APPEND lwa_toolbar     TO e_object->mt_toolbar.   " Agregar botón al toolbar
+  ENDMETHOD.
+
+
+  METHOD handle_user_command.
+    CASE e_ucomm.
+      WHEN 'REFRESH'. " Identificador del botón
+        me->refrescar_alv( ). " Llamar al método para actualizar el ALV
+    ENDCASE.
+  ENDMETHOD.
+
 
   METHOD refrescar_alv.
     DATA: lw_refresh TYPE lvc_s_stbl,
