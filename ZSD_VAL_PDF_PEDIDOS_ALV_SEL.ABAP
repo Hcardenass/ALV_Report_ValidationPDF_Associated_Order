@@ -4,8 +4,8 @@
 
 * Definición de la pantalla de selección con un bloque y título
 SELECTION-SCREEN: BEGIN OF BLOCK a01 WITH FRAME TITLE TEXT-a01.
-" Inicia un bloque de selección en la pantalla de selección.
-" El bloque tiene un marco visual y un título que se toma de la variable TEXT-A01
+  " Inicia un bloque de selección en la pantalla de selección.
+  " El bloque tiene un marco visual y un título que se toma de la variable TEXT-A01
 
 * Definición de un conjunto de opciones de selección para el campo 'vbeln' (número de pedido)
   SELECT-OPTIONS: p_vbeln FOR vbak-vbeln.
@@ -21,5 +21,23 @@ SELECTION-SCREEN: BEGIN OF BLOCK a01 WITH FRAME TITLE TEXT-a01.
 
 * Finalización del bloque de selección en la pantalla de selección
 SELECTION-SCREEN: END OF BLOCK a01.
- " Finaliza el bloque de selección con el nombre A01.
-  " Esto indica que el bloque de selección para los campos 'p_vbeln' y 's_erdat' ha terminado.
+" Finaliza el bloque de selección con el nombre A01.
+" Esto indica que el bloque de selección para los campos 'p_vbeln' y 's_erdat' ha terminado.
+
+
+AT SELECTION-SCREEN ON p_vbeln.
+  PERFORM f_verificar_pedido.
+
+
+FORM f_verificar_pedido.
+
+  SELECT vbeln INTO TABLE @DATA(lt_const)
+    FROM vbak
+   WHERE auart IN ('ZP01','ZP03','ZP05','ZP11','ZP02','ZP18') AND
+        vbeln IN @p_vbeln.
+
+  IF sy-subrc <> 0.
+    MESSAGE e398(00) WITH TEXT-001.
+  ENDIF.
+
+ENDFORM.
