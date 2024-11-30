@@ -21,7 +21,7 @@ The implementation of this ALV report aims to facilitate the identification of o
 ![IncludeSEL](IMG/ZSD_VAL_PDF_PEDIDOS_ALV_SEL.png)
 
 ### INCLUDE ZSD_VAL_PDF_PEDIDOS_ALV_CLS.
-[Ver el código aquí](src/ZSD_VAL_PDF_PEDIDOS_ALV_CLS.ABAP)
+[Ver el código aquí](ZSD_VAL_PDF_PEDIDOS_ALV_CLS.ABAP)
 
 ### INCLUDE ZSD_VAL_PDF_PEDIDOS_ALV_MAI.
 ![IncludeMAI](IMG/ZSD_VAL_PDF_PEDIDOS_ALV_MAI.png)
